@@ -9,7 +9,7 @@ dotenv.config();
 
 const authRoutes = require("./routes/authroutes");
 
-const app = express();                 // ✅ app은 먼저 생성
+const app = express();                 // app은 먼저 생성
 const PORT = process.env.PORT || 3000;
 
 // 미들웨어
@@ -28,8 +28,12 @@ mongoose.connect(process.env.MONGO_URI)
 // 기본 라우트
 app.get("/", (_req, res) => res.send("PhotoMemo API OK"));
 
-// ✅ 회원 인증 라우트 등록 (한 번만)
+//  회원 인증 라우트 등록 (한 번만)
 app.use("/api/auth", authRoutes);
+
+// 회원가입
+const authRouter = require("./routes/authroutes");
+app.use("/auth", authRouter);
 
 // 에러 처리 (마지막)
 app.use((err, req, res, next) => {

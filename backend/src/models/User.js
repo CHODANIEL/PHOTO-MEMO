@@ -34,21 +34,29 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        loginAttempts: {
+            type: Number,
+            default: 0
+        },
+        loginAttempts: {
+            type: Number
+            , default: 0
+        },
     },
     {
-        timestamps: true, 
+        timestamps: true,
     }
 );
 
-userSchema.method.comparePassword=function(plain){
-    return bcrypt.compare(plain,this.passwordHash)
+userSchema.method.comparePassword = function (plain) {
+    return bcrypt.compare(plain, this.passwordHash)
 }
 
-userSchema.method.toSafeJson=function(){
-    const obj =this.toObject({versionKey:false})
+userSchema.method.toSafeJson = function () {
+    const obj = this.toObject({ versionKey: false })
     delete obj.passwordHash
     return obj
 }
-userSchema.index({email:1},{unique:true})
+userSchema.index({ email: 1 }, { unique: true })
 
 module.exports = mongoose.model("User", userSchema);
