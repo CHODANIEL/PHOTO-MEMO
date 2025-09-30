@@ -8,14 +8,14 @@ module.exports = function auth(req, res, next) {
             ? h.slice(7)
             : (req.cookies?.token || null)
 
-            if(!token){
-                return res.status.json({message:"인증 필요"})
-            }
+        if (!token) {
+            return res.status.json({ message: "인증 필요" })
+        }
 
-            req.user=jwt.verify(token,process.env.JWT_SECRET)
+        req.user = jwt.verify(token, process.env.JWT_SECRET)
 
-            return next()
+        return next()
     } catch (error) {
-        return res.status.json({message:"토큰 무효"})
+        return res.status.json({ message: "토큰 무효" })
     }
 }

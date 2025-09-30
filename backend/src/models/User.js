@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
+
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -10,53 +11,52 @@ const userSchema = new mongoose.Schema(
             required: true,
             lowercase: true,
             trim: true,
-            match: [EMAIL_REGEX, "유효한 이메일을 입력하세요."],
+            match: [EMAIL_REGEX, "유효한 이메일"]
         },
         passwordHash: {
             type: String,
-            required: true,
+            required: true
         },
         displayName: {
             type: String,
             trim: true,
-            default: "",
+            default: ""
         },
         role: {
             type: String,
             enum: ["user", "admin"],
             default: "user",
+            index: true
         },
         isActive: {
             type: Boolean,
-            default: true,
+            default: true
         },
-        isLogin: {
+        isLoggined: {
             type: Boolean,
-            default: false,
+            default: false
         },
         loginAttempts: {
             type: Number,
             default: 0
-        },
-        loginAttempts: {
-            type: Number
-            , default: 0
-        },
+        }
     },
     {
-        timestamps: true,
+        timestamps: true
     }
-);
+)
 
-userSchema.method.comparePassword = function (plain) {
+userSchema.methods.comparePassword = function (plain) {
     return bcrypt.compare(plain, this.passwordHash)
 }
 
-userSchema.method.toSafeJson = function () {
+
+
+userSchema.methods.toSafeJSON = function () {
     const obj = this.toObject({ versionKey: false })
     delete obj.passwordHash
     return obj
 }
 userSchema.index({ email: 1 }, { unique: true })
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema)
