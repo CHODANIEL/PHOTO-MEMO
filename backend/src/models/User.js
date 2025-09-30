@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,10 +46,10 @@ const userSchema = new mongoose.Schema(
     }
 )
 
-userSchema.methods.comparePassword = function (plain) {
-    return bcrypt.compare(plain, this.passwordHash)
-}
 
+userSchema.methods.comparePassword = function (password) {
+    return bcrypt.compare(password, this.passwordHash);
+};
 
 
 userSchema.methods.toSafeJSON = function () {
