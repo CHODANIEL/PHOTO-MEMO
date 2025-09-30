@@ -77,9 +77,11 @@ router.post("/login", async (req, res) => {
         const INVALID = { message: "이메일 또는 비밀번호가 올바르지 않습니다." };
         if (!user) return res.status(401).json(INVALID);
 
+        
+
         // 실패 횟수 확인 (5회 이상이면 차단)
         if (user.loginAttempts >= 5) {
-            return res.status(403).json({ message: "로그인 시도 횟수가 초과되었습니다." });
+            return res.status(423).json({ message: "로그인 시도 횟수가 초과되었습니다." });
         }
 
         const ok = await bcrypt.compare(password, user.passwordHash);
@@ -110,7 +112,7 @@ router.post("/login", async (req, res) => {
         return res.status(500).json({ message: "로그인 실패" });
     }
 });
-
+    
 // 로그인 사용자 정보 확인
 router.get("/me", async (req, res) => {
     try {
