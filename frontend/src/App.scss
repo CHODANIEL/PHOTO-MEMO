@@ -1,0 +1,52 @@
+/* src/App.scss (또는 src/pages/Landing.scss) */
+.landing {
+    display: grid;
+    place-items: center;
+    min-height: 80vh;
+    background: linear-gradient(180deg, #fafcff, #ffffff);
+
+    .landing-hero {
+        text-align: center;
+        margin-bottom: 3rem;
+
+        p {
+            color: var(--muted);
+            margin-top: .8rem;
+        }
+
+        .btn {
+            margin-top: 1.6rem;
+        }
+    }
+
+    .landing-features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+        max-width: 96rem;
+        margin: 0 auto;
+
+        li {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-l);
+            padding: 1.6rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+
+            h3 {
+                margin-bottom: .6rem;
+            }
+
+            p {
+                color: var(--muted);
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .landing .landing-features {
+        grid-template-columns: 1fr;
+    }
+}
