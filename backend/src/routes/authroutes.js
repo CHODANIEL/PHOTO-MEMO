@@ -1,198 +1,132 @@
+// backend/routes/authroutes.js
+
 const express = require("express")
 const router = express.Router()
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
 const User = require("../models/User")
-const auth = require("../middleware/auth")
+const auth = require("../middleware/auth") // 👈 1. auth 미들웨어 불러오기
 
-
+// (makeToken 함수는 동일)
 function makeToken(user) {
     return jwt.sign(
-        {
-            id: user._id.toString(),
-            role: user.role,
-            email: user.email
-        },
+        { id: user._id.toString(), role: user.role, email: user.email },
         process.env.JWT_SECRET,
-        {
-            expiresIn: "7d"
-        }
-
-    )
+        { expiresIn: "7d" }
+    );
 }
 
+// --- 1. 공개 라우트 (로그인 필요 없음) ---
+
+// POST /api/users/register
 router.post("/register", async (req, res) => {
+    // (회원가입 로직은 동일)
     try {
         const { email, password, displayName, role } = req.body
-
         if (!email || !password) {
             return res.status(400).json({ message: "이메일/비밀번호 필요" })
         }
-
-        const exists = await User.findOne({
-            email: email.toLowerCase()
-        })
+        const exists = await User.findOne({ email: email.toLowerCase() })
         if (exists) {
-
             return res.status(400).json({ message: "이미 가입된 이메일" })
         }
-
         const passwordHash = await bcrypt.hash(password, 10)
-
         const validRoles = ["user", "admin"]
         const safeRole = validRoles.includes(role) ? role : "user"
-
         const user = await User.create({
             email,
             displayName,
             passwordHash,
             role: safeRole
         })
-
         res.status(201).json({ user: user.toSafeJSON() })
-
     } catch (error) {
         return res.status(500).json({
             message: "회원가입 실패",
             error: error.message
         })
-
     }
-})
+});
 
-const LOCK_MAX = 5
+// POST /api/users/login
 router.post("/login", async (req, res) => {
+    // (로그인 로직은 동일)
     try {
-        // 1) req.body에서 email, password를 꺼낸다(기본값은 빈 문자열).
         const { email, password } = req.body
-
-        //  2) 이메일을 소문자로 바꿔 활성화된 유저(isActive: true)만 조회한다. .findOne() /.toLowerCase()
-        const user = await User.findOne({
-            email: email.toLowerCase(),
-            isActive: true
-        })
-
-
+        const user = await User.findOne({ email: email.toLowerCase(), isActive: true })
         const invalidMsg = { message: "이메일 또는 비밀번호가 올바르지 않습니다." };
-
-
-        // 3 사용자 없음
         if (!user) {
-            return res.status(400).json({
-                ...invalidMsg,
-                loginAttempts: null,
-                remainingAttempts: null,
-                locked: false
-            })
+            return res.status(400).json({ ...invalidMsg })
         }
-
-        // 4)비밀번호 검증 (User 모델에 comparePassword 메서드가 있다고 가정)
         const ok = await user.comparePassword(password)
-
-        // 5)비밀번호 불일치
         if (!ok) {
             user.loginAttempts += 1
-
-            const remaining = Math.max(0, LOCK_MAX - user.loginAttempts)
-
-            // 5-1 실패 누적 임계치 이상 일때 계정 잠금
-            if (user.loginAttempts >= LOCK_MAX) {
-                user.isActive = false//잠금처리
-
+            const remaining = Math.max(0, 5 - user.loginAttempts)
+            if (user.loginAttempts >= 5) {
+                user.isActive = false
                 await user.save()
-
-                return res.status(423).json({
-                    message: "유효성 검증 실패로 계정이 잠겼습니다. 관리자에게 문의하세요.",
-                    loginAttempts: user.loginAttempts,
-                    remainingAttempts: 0,
-                    locked: true
-                })
+                return res.status(423).json({ message: "계정이 잠겼습니다." })
             }
-            // 5-2 아직 잠금 전 400 현재 실패 남은 횟수 안내
             await user.save()
-            return res.status(400).json({
-                ...invalidMsg,
-                loginAttempts: user.loginAttempts,
-                remainingAttempts: remaining,
-                locked: false
-            })
+            return res.status(400).json({ ...invalidMsg })
         }
-
-
-        // 6 로그인 성공: 실패 카운트 초기화 접속 정보 업데이트
-
         user.loginAttempts = 0
         user.isLoggined = true
         user.lastLoginAt = new Date()
-
         await user.save()
-
-        // 7 JWT 발급 및 쿠키 설정
         const token = makeToken(user)
-
-
         res.cookie('token', token, {
             httpOnly: true,
             sameSite: "lax",
-            secure: "production",
+            secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
-
-
-        // 8 성공 응답: 사용자 정보 +토큰+ 참조용 카운트 
-        return res.status(200).json({
-            user: user.toSafeJSON(),
-            token,
-            loginAttempts: 0,
-            remainingAttempts: LOCK_MAX,
-            locked: false
-        })
-
+        return res.status(200).json({ user: user.toSafeJSON(), token })
     } catch (error) {
         return res.status(500).json({
             message: "로그인 실패",
             error: error.message
         })
     }
-})
+});
 
 
-router.get("/users", async (req, res) => {
+// --- 2. 보호된 라우트 (로그인 필요) ---
+
+// GET /api/users/users
+// 👇👇👇 2. 'auth' 미들웨어를 추가합니다.
+router.get("/users", auth, async (req, res) => {
     try {
         const me = await User.findById(req.user.id)
-        if (!me) return res.status(404).json({ message: '사용자 없음' })
-
-
+        if (!me) return res.status(4404).json({ message: '사용자 없음' })
         if (me.role !== 'admin') {
             return res.status(403).json({ message: '권한 없음' })
         }
         const users = await User.find().select('-passwordHash')
-
         return res.status(200).json({ users })
     } catch (error) {
         res.status(401).json({ message: "조회 실패", error: error.message })
-
     }
-})
+});
 
-router.post("/logout", async (req, res) => {
+// POST /api/users/logout
+// 👇👇👇 3. 'auth' 미들웨어를 추가합니다.
+router.post("/logout", auth, async (req, res) => {
     try {
         await User.findByIdAndUpdate(
             req.user.id,
             { $set: { isLoggined: false }, },
             { new: true }
         )
-
         res.clearCookie('token', {
             httpOnly: true,
             sameSite: "lax",
-            secure: "production",
+            secure: process.env.NODE_ENV === "production",
         })
         return res.status(200).json({ message: '로그아웃 성공' })
     } catch (error) {
-
         return res.status(500).json({ message: '로그아웃 실패', error: error.message })
     }
-})
+});
 
-module.exports = router
+module.exports = router;
