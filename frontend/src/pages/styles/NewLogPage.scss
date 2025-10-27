@@ -1,0 +1,38 @@
+/* src/pages/NewLogPage.scss */
+/* (MapPage.scss의 .log-form 스타일을 대부분 가져옵니다) */
+
+.new-log-page-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+
+    .coords-info {
+        color: green;
+        font-weight: bold;
+    }
+
+    .log-form {
+        /* (MapPage.scss와 동일한 폼 스타일) */
+        border: 1px solid var(--border, #ccc);
+        padding: 15px;
+        border-radius: 8px;
+        background: var(--surface, #f9f9f9);
+
+        .form-group {
+            margin-bottom: 10px;
+            label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 600;
+            }
+            input[type="text"],
+            input[type="file"] {
+                width: 100%;
+            }
+        }
+
+        .btn-primary[disabled] {
+            opacity: 0.6;
+        }
+    }
+}

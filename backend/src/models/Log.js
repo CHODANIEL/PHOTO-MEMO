@@ -3,34 +3,46 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// --- (신규) GeoJSON을 위한 locationSchema ---
+// MongoDB의 Geospatial(지리 공간) 기능을 사용하기 위한 스키마
+const locationSchema = new Schema({
+    type: {
+        type: String,
+        enum: ['Point'], // 'Point' 타입만 허용
+        required: true
+    },
+    coordinates: {
+        type: [Number], // [경도(longitude), 위도(latitude)] 순서로 저장
+        required: true
+    }
+});
+
 const LogSchema = new Schema({
-    // 1. 작성자 (User 모델과 연결)
     user: {
         type: Schema.Types.ObjectId,
-        ref: 'User', // 'User' 모델을 참조
+        ref: 'User',
         required: true,
-        index: true // 작성자별로 검색을 빠르게 하기 위함
+        index: true 
     },
-    // 2. 텍스트 메모
     text: {
         type: String,
         required: true,
         trim: true
     },
-    // 3. 사진 URL (S3에 업로드된 경로)
     imageUrl: {
         type: String,
         required: true
     },
-    // 4. 위치 (좌표 또는 주소 문자열)
+    
+    // 👇👇👇 여기가 수정되었습니다! (String -> locationSchema)
     location: {
-        // (나중에 지도 API 연동 시 위도/경도(GeoJSON)로 바꾸면 좋습니다)
-        type: String,
-        default: ""
+        type: locationSchema, // 위에서 정의한 GeoJSON 스키마 사용
+        // (참고) 2dsphere 인덱스를 추가해야 $near (주변 찾기) 쿼리가 가능
+        index: '2dsphere' 
     },
-    // 5. 태그
-    tags: [String] // '#속초', '#맛집' 등을 배열로 저장
+    
+    tags: [String] 
 
-}, { timestamps: true }); // createdAt (작성일) 자동 생성
+}, { timestamps: true }); 
 
 module.exports = mongoose.model('Log', LogSchema);

@@ -17,7 +17,7 @@
         color: white;
         border: none;
         border-radius: 4px;
-        cursor: pointer; // (커서 추가)
+        cursor: pointer;
     }
 
     .divider {
@@ -92,7 +92,6 @@
                     }
                 }
 
-                /* --- 👇 중복된 부분이 여기로 합쳐졌습니다 --- */
                 .log-card-actions {
                     display: flex;
                     gap: 5px;
@@ -117,7 +116,6 @@
                         color: #d32f2f; // 진한 빨강
                     }
                 }
-                /* --- 👆 여기까지 --- */
             }
         }
     }

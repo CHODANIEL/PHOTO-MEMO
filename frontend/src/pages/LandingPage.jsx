@@ -1,6 +1,6 @@
 // src/pages/Landing.jsx
 import { Link } from "react-router-dom";
-import "../styles/LandingPage.scss"; // 스타일 적용 (선택)
+import "./styles/LandingPage.scss"; // 스타일 적용 (선택)
 
 export default function Landing() {
     return (
