@@ -15,57 +15,41 @@ const s3 = new S3Client({
     }
 });
 
-// --- 1. 새 라이딩 로그 생성 (수정됨) ---
-// POST /api/logs
-router.post(
-    '/',
-    upload.single('image'),
-    async (req, res) => {
-        try {
-            // 👇 1. 프론트에서 보낼 데이터 변경 (location 문자열 -> lat, lng)
-            const { text, tags, latitude, longitude } = req.body;
-
-            if (!req.file || !text) {
-                return res.status(400).json({ message: "이미지와 텍스트는 필수입니다." });
-            }
-
-            const imageUrl = req.file.location;
-            const userId = req.user.id;
-
-            // 👇 2. location (GeoJSON) 객체 생성
-            let locationData = null;
-            if (latitude && longitude) {
-                locationData = {
-                    type: 'Point',
-                    // (중요!) GeoJSON은 [경도(longitude), 위도(latitude)] 순서입니다.
-                    coordinates: [parseFloat(longitude), parseFloat(latitude)]
-                };
-            }
-
-            const newLog = new Log({
-                user: userId,
-                text: text,
-                imageUrl: imageUrl,
-                location: locationData, // 👈 3. GeoJSON 객체를 저장
-                tags: tags ? tags.split(',') : []
-            });
-
-            const savedLog = await newLog.save();
-            res.status(201).json(savedLog);
-
-        } catch (err) {
-            console.error(err);
-            if (err instanceof multer.MulterError) {
-                return res.status(400).json({ message: err.message });
-            }
-            res.status(500).json({ message: "로그 작성 중 서버 오류가 발생했습니다.", error: err.message });
+// --- 1. 새 라이딩 로그 생성 (POST /api/logs) ---
+router.post('/', upload.single('image'), async (req, res) => {
+    // ... (기존 생성 로직 동일)
+    try {
+        const { text, tags, latitude, longitude } = req.body;
+        if (!req.file || !text) {
+            return res.status(400).json({ message: "이미지와 텍스트는 필수입니다." });
         }
+        const imageUrl = req.file.location;
+        const userId = req.user.id;
+        let locationData = null;
+        if (latitude && longitude) {
+            locationData = {
+                type: 'Point',
+                coordinates: [parseFloat(longitude), parseFloat(latitude)]
+            };
+        }
+        const newLog = new Log({
+            user: userId,
+            text: text,
+            imageUrl: imageUrl,
+            location: locationData,
+            tags: tags ? tags.split(',') : []
+        });
+        const savedLog = await newLog.save();
+        res.status(201).json(savedLog);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "로그 작성 중 서버 오류", error: err.message });
     }
-);
+});
 
-// --- 2. 나의 모든 로그 불러오기 (동일) ---
+// --- 2. 나의 모든 로그 불러오기 (GET /api/logs) ---
 router.get('/', async (req, res) => {
-    // ... (변경 없음)
+    // ... (기존 조회 로직 동일)
     try {
         const logs = await Log.find({ user: req.user.id })
             .sort({ createdAt: -1 })
@@ -73,7 +57,36 @@ router.get('/', async (req, res) => {
         res.status(200).json(logs);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "로그를 불러오는 중 오류가 발생했습니다.", error: err.message });
+        res.status(500).json({ message: "로그 불러오는 중 오류", error: err.message });
+    }
+});
+
+// --- 3. (신규) 특정 로그 1개 불러오기 (GET /api/logs/:id) ---
+router.get('/:id', async (req, res) => {
+    try {
+        const log = await Log.findById(req.params.id)
+            .populate('user', 'displayName email'); // 작성자 정보 포함
+        if (!log) {
+            return res.status(404).json({ message: "로그를 찾을 수 없습니다." });
+        }
+
+        // (보안) 이 로그의 주인이 현재 로그인한 유저가 맞는지 확인
+        if (log.user._id.toString() !== req.user.id) {
+            // (관리자 예외) 만약 관리자라면 통과시킬 수도 있습니다.
+            // if (req.user.role !== 'admin') {
+            //    return res.status(403).json({ message: "권한이 없습니다." });
+            // }
+            return res.status(403).json({ message: "권한이 없습니다." });
+        }
+
+        res.status(200).json(log);
+
+    } catch (err) {
+        console.error(err);
+        if (err.kind === 'ObjectId') {
+            return res.status(400).json({ message: "잘못된 로그 ID 형식입니다." });
+        }
+        res.status(500).json({ message: "로그 조회 중 오류", error: err.message });
     }
 });
 

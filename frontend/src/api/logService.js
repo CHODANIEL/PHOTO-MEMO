@@ -1,7 +1,6 @@
 // src/api/logService.js
 import axios from 'axios';
 
-// 1. axios 인스턴스 생성
 const api = axios.create({
     baseURL: 'http://localhost:3000/api',
     withCredentials: true
@@ -10,6 +9,11 @@ const api = axios.create({
 // (GET) 내 모든 로그 가져오기
 export const getLogs = () => {
     return api.get('/logs');
+};
+
+// (신규) ID로 로그 1개 가져오기
+export const getLogById = (logId) => {
+    return api.get(`/logs/${logId}`);
 };
 
 // (POST) 새 로그 생성하기

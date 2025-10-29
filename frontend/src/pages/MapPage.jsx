@@ -1,7 +1,8 @@
-// src/pages/MapPage.jsx (단순화 버전)
+// src/pages/MapPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import './styles/MapPage.scss';
+import { Link } from 'react-router-dom';
+import './styles/MapPage.scss'; // 👈 1. 여기가 수정되었습니다! (./styles/로 변경)
 import LogCard from '../components/common/LogCard';
 import { getLogs, deleteLog, updateLog } from '../api/logService';
 
@@ -19,13 +20,11 @@ L.Icon.Default.mergeOptions({
 
 
 export default function MapPage() {
-    // 1. 폼(Form) 관련 State 모두 제거
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const seoulCityHall = [37.5665, 126.9780];
 
-    // (Effect) 로그 목록 불러오기 (동일)
+    // (Effect) 로그 목록 불러오기
     useEffect(() => {
         const fetchLogs = async () => {
             try {
@@ -37,9 +36,7 @@ export default function MapPage() {
         fetchLogs();
     }, []);
 
-    // 2. handleSubmit(로그 생성) 핸들러 제거
-
-    // (삭제/수정 핸들러는 동일)
+    // (삭제/수정 핸들러)
     const handleDeleteLog = async (logId) => {
         try {
             await deleteLog(logId);
@@ -61,16 +58,12 @@ export default function MapPage() {
         }
     };
 
-    // 3. handleLogout 핸들러 제거 (Header.jsx로 이동)
-
     return (
         <div className="map-page-container">
-            {/* 4. 헤더 제거 (App.jsx에서 공통으로 관리) */}
-
             <h2 style={{ marginTop: 0 }}>내 라이딩 지도</h2>
             <p>지금까지 기록한 나의 로그들입니다.</p>
 
-            {/* --- 실제 지도 렌더링 영역 (핀만 표시) --- */}
+            {/* --- 실제 지도 렌더링 영역 --- */}
             <div className="map-area" style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
                 <MapContainer center={seoulCityHall} zoom={10} style={{ height: '100%', width: '100%' }}>
                     <TileLayer
@@ -78,7 +71,6 @@ export default function MapPage() {
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
 
-                    {/* 저장된 로그 목록을 마커로 표시 */}
                     {logs.map(log => {
                         if (!log.location) return null;
                         const pos = [
@@ -88,8 +80,13 @@ export default function MapPage() {
                         return (
                             <Marker key={log._id} position={pos}>
                                 <Popup>
-                                    <img src={log.imageUrl} alt={log.text} width="100" />
-                                    <br /> {log.text}
+                                    <div className="map-popup-content">
+                                        <img src={log.imageUrl} alt={log.text} width="100" />
+                                        <p>{log.text}</p>
+                                        <Link to={`/log/${log._id}`} className="btn-detail-link">
+                                            자세히 보기
+                                        </Link>
+                                    </div>
                                 </Popup>
                             </Marker>
                         );
@@ -99,24 +96,6 @@ export default function MapPage() {
 
             <hr className="divider" />
 
-            {/* 5. 폼(Form) JSX 모두 제거 */}
-
-            {/* --- 로그 목록 표시 --- */}
-            <section className="log-list-section">
-                <h2>내 기록 목록</h2>
-                {loading ? (<p>기록을 불러오는 중...</p>) : (
-                    <div className="log-list">
-                        {logs.map(log => (
-                            <LogCard
-                                key={log._id}
-                                log={log}
-                                onDelete={handleDeleteLog}
-                                onEdit={handleEditLog}
-                            />
-                        ))}
-                    </div>
-                )}
-            </section>
         </div>
     );
 }
