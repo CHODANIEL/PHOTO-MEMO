@@ -1,21 +1,73 @@
+/* src/pages/styles/LandingPage.scss */
+
 .landing {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.6rem;
+    }
+
     .landing-hero {
-        padding: 6rem 0;
-        ;
-        background: linear-gradient(135deg, #f7f7ff, #fafafa);
-        border-radius: var(--radius-l);
-        margin-bottom: 3rem;
+        padding: 4rem 0;
+        text-align: center;
+
+        h1 {
+            font-size: 4rem;
+        }
 
         .landing-sub {
+            font-size: 1.8rem;
+            color: var(--muted, #555);
             margin: 1rem 0 2rem;
+        }
+
+        .btn {
+            /* (index.scss의 공통 스타일 사용) */
         }
     }
 
     .landing-features {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 2rem 0;
 
-        >li {
-            flex: 1;
+        li {
+            background: var(--surface, #f9f9f9);
+            border: 1px solid var(--border, #eee);
+            padding: 20px;
+            border-radius: 8px;
+
+            h3 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+
+            p {
+                font-size: 1.4rem;
+                color: #333;
+            }
         }
     }
+
+    /* --- 👇 2. '최신 공개 로그' 섹션 스타일 추가 --- */
+    .public-logs-section {
+        background-color: var(--surface, #f9f9f9);
+        padding: 4rem 0;
+
+        h2 {
+            font-size: 2.4rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* LogListPage.scss의 .log-list 스타일 재활용 */
+        .log-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+    }
+
+    /* --- 👆 --- */
 }

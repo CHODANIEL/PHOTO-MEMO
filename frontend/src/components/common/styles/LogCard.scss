@@ -1,104 +1,73 @@
-/* src/components/common/LogCard.scss */
+/* src/pages/styles/LandingPage.scss */
 
-.log-card {
-    border: 1px solid var(--border, #eee);
-    border-radius: 8px;
-    overflow: hidden; // 이미지 모서리를 둥글게 하기 위함
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    background: #fff;
-    transition: box-shadow 0.2s ease;
-
-    &:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.landing {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.6rem;
     }
 
-    /* 1. 이미지 (이제 Link 태그로 감싸져 있음) */
-    .log-card-image {
-        width: 100%;
-        height: 150px;
-        object-fit: cover; // 이미지가 찌그러지지 않게
-        display: block; // Link 태그 안에서 여백을 없앰
+    .landing-hero {
+        padding: 4rem 0;
+        text-align: center;
+
+        h1 {
+            font-size: 4rem;
+        }
+
+        .landing-sub {
+            font-size: 1.8rem;
+            color: var(--muted, #555);
+            margin: 1rem 0 2rem;
+        }
+
+        .btn {
+            /* (index.scss의 공통 스타일 사용) */
+        }
     }
 
-    /* 2. 카드 콘텐츠 영역 */
-    .log-card-content {
-        padding: 10px 15px; // 좌우 패딩을 조금 더 줌
+    .landing-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 2rem 0;
 
-        /* 3. 제목 텍스트 (Link 태그로 감싸져 있음) */
-        .log-card-title-link {
-            text-decoration: none; // 밑줄 제거
-            color: inherit; // 부모 텍스트 색상 상속
+        li {
+            background: var(--surface, #f9f9f9);
+            border: 1px solid var(--border, #eee);
+            padding: 20px;
+            border-radius: 8px;
 
-            .log-card-text {
-                font-size: 1.5rem; // (폰트 살짝 키움)
-                font-weight: 600;
-                margin-top: 0;
+            h3 {
+                font-size: 1.8rem;
                 margin-bottom: 5px;
-                // (선택) 긴 글은 잘라냄
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
             }
-        }
 
-        /* 4. 위치, 태그, 날짜 공통 스타일 */
-        .log-card-location,
-        .log-card-tags,
-        .log-card-date {
-            font-size: 1.2rem;
-            color: #555;
-            margin-bottom: 5px;
-        }
-
-        .log-card-tags {
-            color: var(--primary, #007bff);
-            font-weight: 500;
-        }
-
-        .log-card-date {
-            font-size: 1rem;
-            color: #888;
-            margin-top: 8px;
-            display: block;
-        }
-    }
-
-    /* 5. 하단 버튼 영역 */
-    .log-card-actions {
-        display: flex;
-        gap: 5px;
-        padding: 0 15px 15px; // 콘텐츠와 동일하게 패딩
-        border-top: 1px solid #f0f0f0; // (선택) 콘텐츠와 구분선
-        padding-top: 10px;
-
-        button {
-            // 공통 버튼 스타일
-            flex: 1; // 버튼이 1:1 비율로 꽉 차게
-            padding: 8px; // (패딩 살짝 키움)
-            border: none;
-            border-radius: 4px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .btn-edit {
-            background-color: #f0f0f0;
-            color: #333;
-
-            &:hover {
-                background-color: #e0e0e0;
-            }
-        }
-
-        .btn-delete {
-            background-color: #ffebee; // 옅은 빨강
-            color: #d32f2f; // 진한 빨강
-
-            &:hover {
-                background-color: #ffcdd2;
+            p {
+                font-size: 1.4rem;
+                color: #333;
             }
         }
     }
+
+    /* --- 👇 2. '최신 공개 로그' 섹션 스타일 추가 --- */
+    .public-logs-section {
+        background-color: var(--surface, #f9f9f9);
+        padding: 4rem 0;
+
+        h2 {
+            font-size: 2.4rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* LogListPage.scss의 .log-list 스타일 재활용 */
+        .log-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+    }
+
+    /* --- 👆 --- */
 }

@@ -1,42 +1,73 @@
-// src/pages/Landing.jsx
-import { Link } from "react-router-dom";
-import "./styles/LandingPage.scss"; // 스타일 적용 (선택)
+// src/pages/LandingPage.jsx
 
-export default function Landing() {
+import React, { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
+import { getPublicLogs } from '../api/publicService'; // 👈 1. public API 임포트
+import LogCard from '../components/common/LogCard'; // 👈 2. LogCard 임포트
+import "./styles/LandingPage.scss";
+
+export default function LandingPage() {
+
+    // --- 👇 3. '공개 로그' state 추가 ---
+    const [publicLogs, setPublicLogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPublicLogs = async () => {
+            try {
+                const res = await getPublicLogs();
+                // (선택) 최신 6개만 보여주기
+                setPublicLogs(res.data.slice(0, 6));
+            } catch (err) {
+                console.error("공개 로그 로드 실패:", err);
+            }
+            setLoading(false);
+        };
+        fetchPublicLogs();
+    }, []); // 👈 [] : 페이지 로드 시 1회 실행
+
     return (
+        // (기존 랜딩 페이지 구조)
         <section className="landing">
             <div className="container">
                 <div className="landing-hero">
-                    {/* H1: 사이트 제목 변경 */}
-                    <h1>라이딩 로그</h1> 
-                    
-                    {/* P: 사이트 부제 변경 (핵심 기능 강조) */}
+                    <h1>라이딩 로그</h1>
                     <p className="landing-sub">나만의 바이크 여정. 사진, 메모, 그리고 지도 위 핀.</p>
-                    
                     <Link to="/login" className="btn btn-primary">
-                        {/* 버튼 텍스트 변경 */}
-                        로그 시작하기 
+                        로그 시작하기
                     </Link>
                 </div>
 
                 <ul className="landing-features">
-                    {/* 기능 1: 컨셉에 맞게 수정 */}
-                    <li>
-                        <h3>간편한 기록</h3>
-                        <p>사진과 간단한 메모로 오늘의 라이딩을 저장하세요.</p>
-                    </li>
-                    {/* 기능 2: 컨셉에 맞게 수정 */}
-                    <li>
-                        <h3>태그 & 검색</h3>
-                        <p>#지역 #맛집 #기종 태그로 원하는 기록을 바로 찾기.</p>
-                    </li>
-                    {/* 기능 3: '지도' 핵심 기능으로 변경 */}
-                    <li>
-                        <h3>나만의 라이딩 맵</h3>
-                        <p>내가 다녀온 모든 곳이 지도 위에 핀으로 표시됩니다.</p>
-                    </li>
+                    {/* ... (기능 소개 리스트는 동일) ... */}
                 </ul>
             </div>
+
+            {/* --- 👇 4. '최신 공개 로그' 섹션 추가 --- */}
+            <section className="public-logs-section">
+                <div className="container">
+                    <h2>최신 공개 라이딩 로그</h2>
+                    {loading ? (
+                        <p>공개 로그를 불러오는 중...</p>
+                    ) : (
+                        <div className="log-list">
+                            {publicLogs.length > 0 ? (
+                                publicLogs.map(log => (
+                                    <LogCard
+                                        key={log._id}
+                                        log={log}
+                                    // (중요) 비로그인 상태이므로 수정/삭제 함수는 전달 X
+                                    // onDelete={() => {}} 
+                                    // onEdit={() => {}}
+                                    />
+                                ))
+                            ) : (
+                                <p>아직 공개된 로그가 없습니다.</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </section>
         </section>
     );
 }

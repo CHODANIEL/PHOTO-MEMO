@@ -1,0 +1,81 @@
+/* src/pages/styles/AdminDashboard.scss */
+
+.admin-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    h1 {
+        margin-top: 0;
+    }
+
+    .divider {
+        margin: 30px 0;
+        border: 0;
+        border-top: 1px solid #eee;
+    }
+
+    .admin-section {
+        h2 {
+            font-size: 2rem;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+    }
+
+    /* 테이블 스타일 */
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+
+        thead {
+            background-color: #f9f9f9;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 1.3rem;
+        }
+
+        th {
+            font-weight: 600;
+        }
+
+        /* 역할(role) 강조 */
+        .role-admin {
+            font-weight: bold;
+            color: #d32f2f; // 빨간색
+        }
+
+        .role-user {
+            color: #555;
+        }
+
+        /* 버튼 스타일 */
+        .btn-role-toggle {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--primary, #007bff);
+            color: white;
+            cursor: pointer;
+
+            &:hover {
+                opacity: 0.9;
+            }
+        }
+
+        .btn-delete-admin {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    }
+}

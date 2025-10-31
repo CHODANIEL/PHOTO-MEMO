@@ -1,35 +1,28 @@
 // src/pages/LogListPage.jsx
-
+// (updateLog 임포트 제거됨)
 import React, { useState, useEffect } from 'react';
 import LogCard from '../components/common/LogCard';
-import { getLogs, deleteLog, updateLog } from '../api/logService';
-import './styles/LogListPage.scss'; // 👈 1. SCSS 파일 임포트
+import { getLogs, deleteLog } from '../api/logService';
+import './styles/LogListPage.scss';
 
 export default function LogListPage() {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
-    // (추후 페이지네이션을 위한 State)
-    // const [currentPage, setCurrentPage] = useState(1);
-    // const [totalPages, setTotalPages] = useState(1);
 
-    // (Effect) 로그 목록 불러오기
     useEffect(() => {
         const fetchLogs = async () => {
             setLoading(true);
             try {
-                // (참고) 나중에 페이지네이션 구현 시: await getLogs(currentPage);
                 const res = await getLogs();
                 setLogs(res.data);
-                // setTotalPages(res.data.totalPages);
             } catch (err) {
                 console.error("로그 목록 불러오기 실패:", err);
             }
             setLoading(false);
         };
         fetchLogs();
-    }, []); // (나중에 [currentPage] 추가)
+    }, []);
 
-    // (삭제/수정 핸들러는 MapPage와 동일)
     const handleDeleteLog = async (logId) => {
         try {
             await deleteLog(logId);
@@ -40,17 +33,7 @@ export default function LogListPage() {
         }
     };
 
-    const handleEditLog = async (logId, updatedData) => {
-        try {
-            const res = await updateLog(logId, updatedData);
-            setLogs(logs.map(log =>
-                log._id === logId ? res.data : log
-            ));
-            alert('로그가 수정되었습니다.');
-        } catch (err) {
-            alert(err.response?.data?.message || "수정 실패");
-        }
-    };
+    // handleEditLog 함수 전체 제거됨
 
     return (
         <div className="log-list-page-container">
@@ -68,7 +51,7 @@ export default function LogListPage() {
                                     key={log._id}
                                     log={log}
                                     onDelete={handleDeleteLog}
-                                    onEdit={handleEditLog}
+                                // onEdit prop 제거됨
                                 />
                             ))
                         ) : (
@@ -77,9 +60,6 @@ export default function LogListPage() {
                     </div>
                 )}
             </section>
-
-            {/* (추후 페이지네이션 UI가 들어갈 자리) */}
-            {/* <div className="pagination-controls"> ... </div> */}
         </div>
     );
 }

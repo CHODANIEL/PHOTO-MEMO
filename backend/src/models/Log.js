@@ -3,46 +3,56 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// --- (신규) GeoJSON을 위한 locationSchema ---
-// MongoDB의 Geospatial(지리 공간) 기능을 사용하기 위한 스키마
+// (locationSchema는 동일)
 const locationSchema = new Schema({
     type: {
         type: String,
-        enum: ['Point'], // 'Point' 타입만 허용
+        enum: ['Point'],
         required: true
     },
     coordinates: {
-        type: [Number], // [경도(longitude), 위도(latitude)] 순서로 저장
+        type: [Number],
         required: true
     }
 });
+
+// --- 👇👇👇 (신규) '댓글'을 위한 서브 스키마 ---
+const commentSchema = new Schema({
+    text: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    user: { // 댓글 작성자
+        type: Schema.Types.ObjectId,
+        ref: 'User', // User 모델과 연결
+        required: true
+    }
+}, { timestamps: true }); // 댓글의 'createdAt' 자동 생성
+// --- 👆👆👆 ---
+
 
 const LogSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        index: true 
+        index: true
     },
-    text: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    imageUrl: {
-        type: String,
-        required: true
-    },
-    
-    // 👇👇👇 여기가 수정되었습니다! (String -> locationSchema)
-    location: {
-        type: locationSchema, // 위에서 정의한 GeoJSON 스키마 사용
-        // (참고) 2dsphere 인덱스를 추가해야 $near (주변 찾기) 쿼리가 가능
-        index: '2dsphere' 
-    },
-    
-    tags: [String] 
+    text: { type: String, required: true, trim: true },
+    imageUrl: { type: String, required: true },
+    location: { type: locationSchema, index: '2dsphere' },
+    tags: [String],
+    isPublic: { type: Boolean, default: false, index: true },
+    likes: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
 
-}, { timestamps: true }); 
+    // --- 👇👇👇 '댓글' 배열 추가 ---
+    comments: [commentSchema] // 위에서 만든 'commentSchema'를 배열로 가짐
+    // --- 👆👆👆 ---
+
+}, { timestamps: true }); // 로그의 'createdAt' 자동 생성
 
 module.exports = mongoose.model('Log', LogSchema);

@@ -2,75 +2,66 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './styles/MapPage.scss'; // 👈 1. 여기가 수정되었습니다! (./styles/로 변경)
+import './styles/MapPage.scss';
 import LogCard from '../components/common/LogCard';
-import { getLogs, deleteLog, updateLog } from '../api/logService';
+import { getLogs, deleteLog } from '../api/logService';
 
-// Leaflet 라이브러리 임포트
+// Leaflet
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+// (MarkerClusterGroup 임포트 삭제됨)
 
-// (Leaflet 아이콘 설정 ...)
+
+// --- 👇👇👇 '핀 없음' 문제 해결 (아이콘 경로 수동 설정) ---
+// (이 코드가 없으면 핀(Marker)이 보이지 않습니다)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+    iconRetinaUrl: 'https.unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+    iconUrl: 'https.unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
     shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
+// --- 👆👆👆 ---
 
 
 export default function MapPage() {
     const [logs, setLogs] = useState([]);
-    const [loading, setLoading] = useState(true);
     const seoulCityHall = [37.5665, 126.9780];
 
-    // (Effect) 로그 목록 불러오기
     useEffect(() => {
         const fetchLogs = async () => {
             try {
                 const res = await getLogs();
                 setLogs(res.data);
-            } catch (err) { console.error("로그 목록 불러오기 실패:", err); }
-            setLoading(false);
+            } catch (err) {
+                console.error("로그 목록 불러오기 실패:", err);
+            }
         };
         fetchLogs();
     }, []);
 
-    // (삭제/수정 핸들러)
-    const handleDeleteLog = async (logId) => {
-        try {
-            await deleteLog(logId);
-            setLogs(logs.filter(log => log._id !== logId));
-            alert('로그가 삭제되었습니다.');
-        } catch (err) {
-            alert(err.response?.data?.message || "삭제 실패");
-        }
-    };
-    const handleEditLog = async (logId, updatedData) => {
-        try {
-            const res = await updateLog(logId, updatedData);
-            setLogs(logs.map(log =>
-                log._id === logId ? res.data : log
-            ));
-            alert('로그가 수정되었습니다.');
-        } catch (err) {
-            alert(err.response?.data?.message || "수정 실패");
-        }
-    };
+    // (handleDeleteLog 함수는 목록이 제거되며 함께 제거됨)
 
     return (
         <div className="map-page-container">
             <h2 style={{ marginTop: 0 }}>내 라이딩 지도</h2>
             <p>지금까지 기록한 나의 로그들입니다.</p>
 
-            {/* --- 실제 지도 렌더링 영역 --- */}
-            <div className="map-area" style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
-                <MapContainer center={seoulCityHall} zoom={10} style={{ height: '100%', width: '100%' }}>
+            {/* --- 지도 영역 --- */}
+            <div
+                className="map-area"
+                style={{ height: '75vh', width: '100%' }}
+            >
+                <MapContainer
+                    center={seoulCityHall}
+                    zoom={10}
+                    style={{ height: '100%', width: '100%' }}
+                >
                     <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
 
+                    {/* (MarkerClusterGroup 제거됨) */}
                     {logs.map(log => {
                         if (!log.location) return null;
                         const pos = [
@@ -81,9 +72,16 @@ export default function MapPage() {
                             <Marker key={log._id} position={pos}>
                                 <Popup>
                                     <div className="map-popup-content">
-                                        <img src={log.imageUrl} alt={log.text} width="100" />
+                                        <img
+                                            src={log.imageUrl}
+                                            alt={log.text}
+                                            width="100"
+                                        />
                                         <p>{log.text}</p>
-                                        <Link to={`/log/${log._id}`} className="btn-detail-link">
+                                        <Link
+                                            to={`/log/${log._id}`}
+                                            className="btn-detail-link"
+                                        >
                                             자세히 보기
                                         </Link>
                                     </div>
@@ -93,9 +91,7 @@ export default function MapPage() {
                     })}
                 </MapContainer>
             </div>
-
-            <hr className="divider" />
-
+            {/* (로그 목록 섹션은 제거됨) */}
         </div>
     );
 }

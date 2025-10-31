@@ -1,15 +1,13 @@
-// src/pages/NewLogPage.jsx
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createLog } from '../api/logService';
-import './styles/NewLogPage.scss'; // (SCSS 파일도 새로 만듭니다)
+import './styles/NewLogPage.scss'; // (사용자 구조)
 
 // Leaflet 라이브러리 임포트
 import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-// (Leaflet 아이콘 설정 ...)
+// (Leaflet 아이콘 설정)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -31,14 +29,14 @@ function MapClickHandler({ setSelectedCoords }) {
     return null;
 }
 
-
 export default function NewLogPage() {
     const navigate = useNavigate();
     const [file, setFile] = useState(null);
     const [text, setText] = useState('');
     const [tags, setTags] = useState('');
     const [selectedCoords, setSelectedCoords] = useState(null);
-    const [isSubmitting, setIsSubmitting] = useState(false); // (로딩 스피너용)
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPublic, setIsPublic] = useState(false); // '공개' 체크박스
 
     const seoulCityHall = [37.5665, 126.9780]; // [위도, 경도]
 
@@ -56,11 +54,12 @@ export default function NewLogPage() {
         formData.append('tags', tags);
         formData.append('latitude', selectedCoords.lat);
         formData.append('longitude', selectedCoords.lng);
+        formData.append('isPublic', isPublic);
 
         try {
             await createLog(formData);
             alert('로그 작성 성공! 내 지도로 이동합니다.');
-            navigate('/map'); // 👈 성공 시 맵 페이지로 이동
+            navigate('/map');
         } catch (err) {
             alert(err.response?.data?.message || "업로드 실패");
             setIsSubmitting(false);
@@ -93,6 +92,7 @@ export default function NewLogPage() {
                     </p>
                 )}
 
+                {/* --- 👇👇👇 사라졌던 폼 요소들입니다 --- */}
                 <div className="form-group">
                     <label htmlFor="log-image">📸 사진 (필수): </label>
                     <input id="log-image" type="file" onChange={(e) => setFile(e.target.files[0])} required />
@@ -105,6 +105,20 @@ export default function NewLogPage() {
                     <label htmlFor="log-tags">🏷️ 태그 (쉼표로 구분): </label>
                     <input id="log-tags" type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="#속초,#맛집" />
                 </div>
+                {/* --- 👆👆👆 --- */}
+
+                {/* --- '공개' 체크박스 --- */}
+                <div className="form-group-checkbox">
+                    <input
+                        type="checkbox"
+                        id="isPublic"
+                        checked={isPublic}
+                        onChange={(e) => setIsPublic(e.target.checked)}
+                    />
+                    <label htmlFor="isPublic">
+                        이 로그를 '전체 공개'합니다.
+                    </label>
+                </div>
 
                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                     {isSubmitting ? '저장 중...' : '로그 저장하기'}
@@ -113,3 +127,4 @@ export default function NewLogPage() {
         </div>
     );
 }
+
