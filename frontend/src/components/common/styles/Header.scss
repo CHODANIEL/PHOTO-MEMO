@@ -1,11 +1,9 @@
-/* src/components/styles/Header.scss */
+/* frontend/src/components/common/styles/Header.scss */
 
 .site-header {
     background-color: #fff;
     border-bottom: 1px solid #eee;
     padding: 0 20px;
-
-    /* 👇 헤더 고정 (sticky) */
     position: sticky;
     top: 0;
     z-index: 100;
@@ -17,7 +15,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        /* 👇 헤더 높이 60px (이게 중요) */
         height: 60px;
     }
 
@@ -32,6 +29,7 @@
         display: flex;
         align-items: center;
         gap: 15px;
+        width: 100%; // (separator를 위해 100% 너비 추가)
 
         .nav-user-welcome {
             font-size: 1.4rem;
@@ -39,17 +37,34 @@
             font-weight: 600;
         }
 
-        .nav-link {
+        .nav-link,
+        .nav-link-admin {
+            // (admin 링크도 스타일 적용)
             text-decoration: none;
             color: #555;
             font-size: 1.4rem;
-            transition: color 0.2s ease;
+            transition: color 0.2s ease, background-color 0.2s ease;
+            padding: 6px 8px;
+            border-radius: 6px;
+
+            &:hover {
+                background-color: #f4f4f4;
+            }
+
+            // --- [신규] NavLink가 활성화(현재 페이지)일 때 ---
+            &.active {
+                color: #3498db; // (테마색)
+                background-color: #eaf5fc;
+                font-weight: 600;
+            }
         }
 
-        /* ... (기타 nav-link, btn-add, nav-link-admin 스타일) ... */
-    }
+        // --- [신규] 비로그인 시, 로그인 버튼을 오른쪽으로 밀기 ---
+        .nav-separator {
+            flex-grow: 1;
+            /* 남은 공간 모두 차지 */
+        }
 
-    .btn-logout {
-        /* ... (로그아웃 버튼 스타일) ... */
+        /* ... (기존 btn-add, btn-logout 스타일이 있다면 여기에 유지) ... */
     }
 }

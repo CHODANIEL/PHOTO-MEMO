@@ -1,5 +1,3 @@
-// backend/routes/logs.js
-
 const router = require('express').Router();
 const Log = require('../models/Log');
 const upload = require('../middleware/upload');
@@ -76,20 +74,32 @@ router.get('/', async (req, res) => {
 });
 
 // --- 3. 특정 로그 1개 불러오기 ---
+// --- ▼▼▼ [수정] 이 라우트의 로직을 변경합니다 ▼▼▼ ---
 // GET /api/logs/:id
 router.get('/:id', async (req, res) => {
     try {
         const log = await Log.findById(req.params.id)
-            // (댓글 추가) 댓글 작성자 정보도 함께 가져옴
             .populate('user', 'displayName email')
             .populate('comments.user', 'displayName email');
+
         if (!log) {
             return res.status(404).json({ message: "로그를 찾을 수 없습니다." });
         }
-        if (log.user._id.toString() !== req.user.id) {
-            return res.status(403).json({ message: "권한이 없습니다." });
+
+        // [수정된 로직]
+        // 1. 로그가 '공개'(isPublic)라면? -> 누구나 볼 수 있음
+        if (log.isPublic) {
+            return res.status(200).json(log);
         }
-        res.status(200).json(log);
+
+        // 2. 로그가 '비공개'라면? -> 주인(owner)인지 확인
+        if (log.user._id.toString() === req.user.id) {
+            return res.status(200).json(log);
+        }
+
+        // 3. '비공개'인데 주인도 아니라면? -> 권한 없음
+        return res.status(403).json({ message: "이 로그를 볼 권한이 없습니다." });
+
     } catch (err) {
         console.error(err);
         if (err.kind === 'ObjectId') {
@@ -98,6 +108,7 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ message: "로그 조회 중 오류", error: err.message });
     }
 });
+// --- ▲▲▲ [수정] ---
 
 // --- 4. 특정 로그 수정하기 ---
 // PUT /api/logs/:id
@@ -171,6 +182,9 @@ router.put('/:id/like', async (req, res) => {
         if (!log) {
             return res.status(404).json({ message: "로그를 찾을 수 없습니다." });
         }
+
+        // [수정] 좋아요는 로그인한 사용자(req.user.id)만 할 수 있습니다.
+        // (authMiddleware가 이미 체크하고 있으므로 별도 코드는 불필요)
         const userId = req.user.id;
         const likeIndex = log.likes.indexOf(userId);
 
@@ -191,11 +205,10 @@ router.put('/:id/like', async (req, res) => {
     }
 });
 
-// --- 👇👇👇 7. (신규) '댓글' 작성 API ---
+// --- 7. '댓글' 작성 API ---
 // POST /api/logs/:id/comment
 router.post('/:id/comment', async (req, res) => {
     try {
-        // 1. 프론트에서 보낸 댓글 내용(text)을 받음
         const { text } = req.body;
         if (!text) {
             return res.status(400).json({ message: "댓글 내용이 필요합니다." });
@@ -206,21 +219,15 @@ router.post('/:id/comment', async (req, res) => {
             return res.status(404).json({ message: "로그를 찾을 수 없습니다." });
         }
 
-        // 2. 새 댓글 객체 생성 (작성자는 로그인한 유저)
         const newComment = {
             text: text,
             user: req.user.id
         };
 
-        // 3. 로그의 comments 배열에 새 댓글 추가
         log.comments.push(newComment);
         await log.save();
 
-        // 4. (중요) 방금 추가된 댓글의 user 정보를 populate해서 반환
-        // (프론트엔드에서 댓글 작성자의 이름을 바로 표시하기 위함)
         const populatedLog = await log.populate('comments.user', 'displayName email');
-
-        // 5. 방금 추가된 마지막 댓글을 프론트로 보냄
         const addedComment = populatedLog.comments[populatedLog.comments.length - 1];
         res.status(201).json(addedComment);
 
@@ -230,7 +237,7 @@ router.post('/:id/comment', async (req, res) => {
     }
 });
 
-// --- 👇👇👇 8. (신규) '댓글' 삭제 API ---
+// --- 8. '댓글' 삭제 API ---
 // DELETE /api/logs/:id/comment/:commentId
 router.delete('/:id/comment/:commentId', async (req, res) => {
     try {
@@ -239,21 +246,16 @@ router.delete('/:id/comment/:commentId', async (req, res) => {
             return res.status(404).json({ message: "로그를 찾을 수 없습니다." });
         }
 
-        // 1. 삭제할 댓글 찾기
         const comment = log.comments.id(req.params.commentId);
         if (!comment) {
             return res.status(404).json({ message: "댓글을 찾을 수 없습니다." });
         }
 
-        // 2. 본인 확인 (댓글 작성자이거나, 로그 주인이어야 삭제 가능)
         if (comment.user.toString() !== req.user.id && log.user.toString() !== req.user.id) {
             return res.status(403).json({ message: "댓글 삭제 권한이 없습니다." });
         }
 
-        // 3. 배열에서 댓글 제거
-        comment.remove(); // (Mongoose 7.x+)
-        // (구버전 Mongoose) log.comments.pull(comment._id);
-
+        comment.remove();
         await log.save();
 
         res.status(200).json({ message: "댓글이 삭제되었습니다." });
