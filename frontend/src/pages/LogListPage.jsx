@@ -37,7 +37,7 @@ export default function LogListPage() {
 
     return (
         <div className="log-list-page-container">
-            <h2>전체 기록 목록</h2>
+            <h2>내 기록 목록</h2>
             <p>내가 작성한 모든 로그를 확인합니다.</p>
 
             <section className="log-list-section">

@@ -25,7 +25,7 @@ export default function Header() {
 
                 {/* --- 1. 로고 (이제 항상 /explore-map 으로 이동) --- */}
                 <Link to={logoLinkPath} className="logo">
-                    PHOTO MEMO 🏍️
+                    BIKE MEMO
                 </Link>
 
                 {/* --- 2. 네비게이션 링크 --- */}

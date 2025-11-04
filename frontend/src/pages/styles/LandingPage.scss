@@ -1,73 +1,185 @@
-/* src/pages/styles/LandingPage.scss */
+/* frontend/src/pages/styles/LandingPage.scss */
 
-.landing {
+/* --- 1. 히어로 섹션 (Hero Section) --- */
+
+/* index.scss의 .container 스타일을 피하기 위해
+  LandingPage.jsx에서 <main className="landing-page-main">을 사용했습니다.
+  이제 이 전용 <main> 태그에 스타일을 적용합니다.
+*/
+main.landing-page-main {
+    /* index.scss의 main { padding-top: 60px; } 스타일은 
+      그대로 적용됩니다. 
+      여기서는 padding-top을 0으로 덮어써서 
+      히어로 이미지가 헤더 바로 밑에 붙게 합니다.
+    */
+    padding-top: 0;
+}
+
+.landing-hero {
+    position: relative; // (overlay를 위한 기준점)
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 60vh; // (화면 높이의 60%)
+    padding: 40px 20px;
+    color: #fff; // (기본 텍스트 색상을 흰색으로)
+
+    /* --- 오토바이 배경 이미지 --- */
+    background-image: url('https://images.unsplash.com/photo-1558981403-c5f9899a28bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=1740&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; // (스크롤 시 배경 고정 효과)
+
+    /* --- 어두운 오버레이 --- */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5); // (50% 검은색)
+        z-index: 1;
+    }
+
+    /* --- 히어로 콘텐츠 (텍스트, 버튼) --- */
+    h1,
+    .landing-sub,
+    .btn-primary {
+        position: relative;
+        z-index: 2; // (오버레이 위로)
+    }
+
+    h1 {
+        font-size: 3.5rem; // (index.scss 값을 덮어씀)
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .landing-sub {
+        font-size: 1.25rem;
+        margin-bottom: 30px;
+        max-width: 600px;
+        color: #f9f9f9;
+    }
+
+    .btn.btn-primary {
+        /* (index.scss의 .btn 스타일을 상속받고 추가) */
+        font-size: 1.1rem;
+        padding: 15px 35px;
+        background-color: var(--primary); // (index.scss의 변수 사용)
+        color: var(--primary-contrast);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+        border: none; // (index.scss의 border 덮어쓰기)
+
+        &:hover {
+            background-color: #2980b9; // (임시 색상)
+            transform: translateY(-3px);
+        }
+    }
+}
+
+
+/* --- 2. 최신 공개 로그 섹션 --- */
+.public-logs-section {
+    padding: 60px 20px;
+    background-color: #f9f9f9; // (배경색 살짝 다르게)
+
+    /* index.scss의 .container (max-width: 96rem)를 
+      그대로 사용합니다. 
+      (더 넓게 하고 싶다면 1200px로 덮어쓸 수 있습니다)
+    */
     .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1.6rem;
+        /* 예: max-width: 1200px; */
     }
 
-    .landing-hero {
-        padding: 4rem 0;
+    h2 {
+        font-size: 2.5rem;
+        font-weight: 600;
         text-align: center;
-
-        h1 {
-            font-size: 4rem;
-        }
-
-        .landing-sub {
-            font-size: 1.8rem;
-            color: var(--muted, #555);
-            margin: 1rem 0 2rem;
-        }
-
-        .btn {
-            /* (index.scss의 공통 스타일 사용) */
-        }
+        margin-bottom: 40px;
+        color: #333;
     }
 
-    .landing-features {
+    .log-list {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 20px;
-        padding: 2rem 0;
+        align-items: stretch; // (그리드 아이템 높이 통일)
+    }
 
-        li {
-            background: var(--surface, #f9f9f9);
-            border: 1px solid var(--border, #eee);
-            padding: 20px;
+    /* LogCard.jsx는 이 클래스들을 사용한다고 가정합니다.
+      (만약 LogCard.scss가 따로 있다면, 그 파일에서 수정해야 합니다)
+    */
+    .log-card-link {
+        text-decoration: none;
+        color: inherit;
+        height: 100%; // (그리드 높이 통일)
+
+        /* --- ▼▼▼ [수정] 카드 높이 통일 CSS ▼▼▼ --- */
+        .log-card {
+            background-color: #fff;
             border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-            h3 {
-                font-size: 1.8rem;
-                margin-bottom: 5px;
+            /* 1. Flexbox로 변경 */
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            /* (부모 .log-card-link의 100%) */
+
+            &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             }
 
-            p {
-                font-size: 1.4rem;
-                color: #333;
+            .card-image {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+                flex-shrink: 0;
+                /* (높이 200px 고정) */
+            }
+
+            .card-content {
+                padding: 15px;
+                /* 2. 내용 영역이 남은 공간을 꽉 채우도록 */
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+
+                .card-text {
+                    font-size: 1rem;
+                    margin: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    min-height: 40px;
+                    /* (최소 2줄 높이) */
+
+                    /* 3. 텍스트 영역이 남은 공간을 채움 (카드 하단 정렬 효과) */
+                    flex-grow: 1;
+                }
+
+                /* (작성자, 날짜 등이 있다면 여기에 스타일 추가) */
+                .card-author {
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    color: var(--muted);
+                    margin-top: 10px;
+                }
             }
         }
+
+        /* --- ▲▲▲ --- */
     }
-
-    /* --- 👇 2. '최신 공개 로그' 섹션 스타일 추가 --- */
-    .public-logs-section {
-        background-color: var(--surface, #f9f9f9);
-        padding: 4rem 0;
-
-        h2 {
-            font-size: 2.4rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        /* LogListPage.scss의 .log-list 스타일 재활용 */
-        .log-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-        }
-    }
-
-    /* --- 👆 --- */
 }

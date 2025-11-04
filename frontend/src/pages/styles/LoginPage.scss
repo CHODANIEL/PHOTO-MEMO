@@ -1,0 +1,113 @@
+/* frontend/src/pages/styles/LoginPage.scss */
+/* (RegisterPage.scss와 공유해도 좋습니다) */
+
+/* --- 1. 전체 페이지 컨테이너 --- */
+.auth-page-container {
+    /* index.scss의 main { padding-top: 60px; } 스타일이 적용됨 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: calc(100vh - 60px);
+    /* (헤더 높이 60px 제외) */
+    background-color: var(--surface, #f9f9f9);
+}
+
+/* --- 2. 폼이 담긴 흰색 카드 --- */
+.auth-form-card {
+    background: var(--bg, #fff);
+    padding: 30px 35px;
+    border-radius: var(--radius-l, 10px);
+    border: 1px solid var(--border, #eee);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 450px;
+
+    h2 {
+        text-align: center;
+        font-size: 2.4rem;
+        font-weight: 600;
+        margin-bottom: 25px;
+        color: var(--text, #111);
+    }
+}
+
+/* --- 3. 폼 기본 스타일 --- */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* (폼 그룹 사이의 간격) */
+}
+
+/* --- 4. 개별 입력창 그룹 (라벨 + 인풋) --- */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* (라벨과 인풋 사이 간격) */
+
+    label {
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: var(--muted, #555);
+    }
+
+    input {
+        /* (index.scss 스타일 상속) */
+        font-size: 1.5rem;
+        width: 100%;
+
+        &:focus {
+            border-color: var(--primary, #239beb);
+            box-shadow: 0 0 0 2px rgba(35, 155, 235, 0.2);
+        }
+    }
+}
+
+/* --- 5. 에러 메시지 --- */
+.error-message {
+    color: #e74c3c;
+    background-color: #fbebee;
+    border: 1px solid #e74c3c;
+    padding: 10px;
+    border-radius: var(--radius-s, 5px);
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+/* --- 6. 로그인 버튼 (수정) --- */
+/* ( .auth-form 내부의 버튼에만 100% 너비 적용 ) */
+.auth-form .btn.btn-primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* --- 7. 회원가입 링크 --- */
+.auth-switch-link {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border, #eee);
+
+    p {
+        font-size: 1.4rem;
+        color: var(--muted, #555);
+    }
+
+    a {
+        margin-left: 8px;
+        color: var(--primary, #239beb);
+        font-weight: 600;
+        text-decoration: underline;
+
+        &:hover {
+            color: #1c7ab9;
+            /* (임시 호버 색상) */
+        }
+    }
+}
