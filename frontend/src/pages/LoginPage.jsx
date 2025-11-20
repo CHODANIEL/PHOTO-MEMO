@@ -18,7 +18,7 @@ export default function LoginPage() {
         try {
             // (참고: authService.js로 분리하는 것이 더 좋습니다)
             const res = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/users/register`, // (백엔드 주소)
+                `${import.meta.env.VITE_API_URL}/api/users/login`, // (백엔드 주소)
                 { email, password },
                 {
                     withCredentials: true // (httpOnly 쿠키를 위해)
