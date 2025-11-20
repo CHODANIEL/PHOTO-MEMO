@@ -8,21 +8,21 @@ export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState(''); // 1. 이름 필드 추가
-    const [error, setError] = useState(null); 
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     // 2. 회원가입 핸들러
     const handleRegister = async (e) => {
-        e.preventDefault(); 
-        setError(null);     
+        e.preventDefault();
+        setError(null);
 
         try {
             // 3. 백엔드 /register API 호출
             await axios.post(
-                'http://localhost:3000/api/users/register', // 👈 API 경로 변경
-                { 
-                    email, 
-                    password, 
+                `${import.meta.env.VITE_API_URL}/api/users/register`, // 👈 API 경로 변경
+                {
+                    email,
+                    password,
                     displayName // 👈 이름(displayName) 추가
                 },
                 // (참고) 회원가입은 쿠키를 다루지 않으므로 withCredentials는 필수 아님
@@ -64,16 +64,16 @@ export default function RegisterPage() {
                         onChange={(e) => setPassword(e.target.value)} required
                     />
                 </div>
-                
+
                 {error && <p style={{ color: 'red' }}>{error}</p>}
-                
+
                 {/* 7. 버튼 텍스트 변경 */}
                 <button type="submit" className="btn btn-primary">회원가입</button>
             </form>
 
             <div style={{ marginTop: '20px' }}>
                 <p>
-                    이미 계정이 있으신가요? 
+                    이미 계정이 있으신가요?
                     <Link to="/login" style={{ marginLeft: '10px', color: 'blue' }}>
                         로그인하러 가기
                     </Link>
