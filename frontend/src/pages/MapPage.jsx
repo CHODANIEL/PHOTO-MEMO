@@ -3,17 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './styles/MapPage.scss';
-import axios from 'axios'; // 👈 axios 직접 사용 (getLogs 대신)
+import axios from 'axios';
 
-// Leaflet
+// Leaflet 라이브러리
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-// --- 핀 이미지 경로 설정 (오타 수정됨!) ---
+// ⭐ [핵심 수정] 지도가 깨지지 않도록 CSS 파일을 꼭 불러와야 합니다!
+import 'leaflet/dist/leaflet.css';
+
+// 핀 이미지 주소 설정 (오타 수정 완료)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png', // 👈 https. -> https:// 로 수정
-    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',         // 👈 https. -> https:// 로 수정
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
     shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
@@ -24,7 +27,7 @@ export default function MapPage() {
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                // 👇 수정된 부분: getLogs() 대신 공개 API 주소 사용
+                // 공개된 로그 데이터 가져오기
                 const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/public/logs`);
                 setLogs(res.data);
             } catch (err) {
@@ -51,7 +54,6 @@ export default function MapPage() {
                     />
 
                     {logs.map(log => {
-                        // 위치 데이터(location)가 있는 것만 핀 찍기
                         if (!log.location || !log.location.coordinates) return null;
 
                         const pos = [
@@ -62,7 +64,6 @@ export default function MapPage() {
                             <Marker key={log._id} position={pos}>
                                 <Popup>
                                     <div className="map-popup-content">
-                                        {/* 이미지가 있을 때만 표시 */}
                                         {log.imageUrl && (
                                             <img
                                                 src={log.imageUrl}
