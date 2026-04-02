@@ -1,0 +1,26 @@
+/* src/pages/styles/LogListPage.scss */
+
+.log-list-page-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    h2 {
+        margin-top: 0;
+    }
+
+    /* MapPage.scss의 .log-list-section 스타일을
+      그대로 가져옵니다. 
+    */
+    .log-list-section {
+        margin-top: 20px;
+
+        .log-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+
+            /* .log-card 스타일은 LogCard.scss에 있습니다. */
+        }
+    }
+}

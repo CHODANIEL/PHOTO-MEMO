@@ -1,0 +1,26 @@
+<!-- frontend/index.html -->
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 
+      👇👇👇 '지도 깨짐' 해결 (이 줄을 추가합니다)
+      Vite(Rolldown)를 거치지 않고, CDN에서 CSS를 직접 로드합니다.
+    -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin="" />
+  <!-- 👆👆👆 -->
+
+  <title>Photo Memo App</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
